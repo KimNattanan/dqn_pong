@@ -17,7 +17,7 @@ epsilon_min = 0.01
 batch_size = 32
 target_network_update_int = 500
 
-game = Game(True,0.05)
+game = Game(True,0.001)
 networks = [(Network(),Network()),(Network(),Network())]
 memos = [deque(maxlen=memory_size),deque(maxlen=memory_size)]
 
@@ -73,6 +73,6 @@ for ep in range(number_of_ep):
     if done:
       break
 
-  if (ep+1)%100==0 or ep==0:
-    networks[0][0].save('./checkpointstf/test_left_{}.pt'.format(ep+1))
-    networks[1][0].save('./checkpointstf/test_right_{}.pt'.format(ep+1))
+  if (ep+1)%100==0:
+    networks[0][0].save('./checkpoints/test_left_{}.pt'.format(ep+1))
+    networks[1][0].save('./checkpoints/test_right_{}.pt'.format(ep+1))

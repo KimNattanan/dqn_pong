@@ -15,7 +15,7 @@ class Network(nn.Module):
     self.loss_func = nn.MSELoss()
 
   def forward(self,x):
-    x = torch.tensor(x) # 3
+    x = torch.tensor(x).to('cuda') # 6
     x = self.relu(self.fc1(x)) # 100
     V = self.relu(self.fc4(x)) # 50
     V = self.fc5(V) # 1
@@ -25,8 +25,8 @@ class Network(nn.Module):
     return Q
   
   def fit(self,x,y):
-    x = torch.tensor(x)
-    y = torch.tensor(y)
+    x = torch.tensor(x).to('cuda')
+    y = torch.tensor(y).to('cuda')
     self.optimizer.zero_grad()
     pred = self(x)
     loss = self.loss_func(pred,y)
