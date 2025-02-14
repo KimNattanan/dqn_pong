@@ -59,8 +59,10 @@ for ep in range(number_of_ep):
     rewards = np.array([game.getReward(0),game.getReward(1)])
     sum_rewards += rewards
 
-    if rewards[1]!=0:
-      print(rewards[1])
+    if rewards[0]==1:
+      print('L: hit')
+    if rewards[1]==1:
+      print('R: hit')
 
     next_state = game.getState()
     done = game.isGameOver()
@@ -96,12 +98,16 @@ for ep in range(number_of_ep):
     if done:
       if rewards[0]>0:
         game.scores[0] += 1
+        print('L: win ',game.scores[0])
       else:
         game.scores[1] += 1
+        print('R: win ',game.scores[1])
       break
   rewards_hist = np.append(rewards_hist,[sum_rewards],axis=0)
 
-  if (ep+1)%10==0:
-    models[0,0].save('./checkpoints/test_left_{}.pt'.format(ep+1))
-    models[1,0].save('./checkpoints/test_right_{}.pt'.format(ep+1))
+  if (ep+1)%100==0:
+    models[0,0].save('./checkpoints/duel_L_online_{}.pt'.format(ep+1))
+    models[0,1].save('./checkpoints/duel_L_target_{}.pt'.format(ep+1))
+    models[1,0].save('./checkpoints/duel_R_online_{}.pt'.format(ep+1))
+    models[1,1].save('./checkpoints/duel_R_target_{}.pt'.format(ep+1))
     pickle.dump(rewards_hist,open('./graphs/rewards_hist.pkl','wb'))

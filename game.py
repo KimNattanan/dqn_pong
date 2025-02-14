@@ -11,7 +11,7 @@ class Player:
   def __init__(self,x,y,w,h):
     self.x, self.y = x,y
     self.w, self.h = w,h
-    self.speed = 2
+    self.speed = 1*5
 
   def move(self,dx,dy):
     self.x = max(0,min(self.x+dx*self.speed,WINDOW_W-self.w))
@@ -26,7 +26,7 @@ class Player:
 class Ball:
   def __init__(self,x,y,rad,dx,dy):
     self.x, self.y, self.rad = x,y,rad
-    self.speed = 4
+    self.speed = 2*5
     self.dx, self.dy = dx,dy
   
   def move(self):
@@ -62,8 +62,8 @@ class App:
     if self.plr2: del self.plr2
     if self.ball: del self.ball
 
-    self.plr1 = Player(50,WINDOW_H/2-50,10,100)
-    self.plr2 = Player(WINDOW_W-50,WINDOW_H/2-50,10,100)
+    self.plr1 = Player(50,WINDOW_H/2-50,20,100)
+    self.plr2 = Player(WINDOW_W-50,WINDOW_H/2-50,20,100)
     self.up, self.down, self.hits = np.array([False]*2),np.array([False]*2),np.array([0]*2)
     ball_vx = random.randint(1,10)
     if random.randint(0,1) : ball_vx = -ball_vx
@@ -199,14 +199,16 @@ class Game:
     return 0
   def getReward(self,id):
     if self.app.ball.x<0:
-      if id==0: return -3
-      return 3
+      if id==0: return -100
+      return 20
     if self.app.ball.x>WINDOW_W:
-      if id==0: return 3
-      return -3
+      if id==0: return 20
+      return -100
     if self.app.hits[id]:
       self.app.hits[id] = 2
-      return 1
+      return 2
+    if self.app.hits[id^1]:
+      return -1
     return 0
   
   def up(self,id):

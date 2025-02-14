@@ -9,7 +9,7 @@ from network import Network
 
 
 WINDOW_W, WINDOW_H = 800, 480
-CHECKPOINT_PATH = './checkpoints/duel_left_plr_4400.pt'
+CHECKPOINT_PATH = './checkpoints/duel_L_2600.pt'
 
 game = Game(True)
 model = torch.load(CHECKPOINT_PATH,weights_only=False)
@@ -18,8 +18,12 @@ model.eval()
 with torch.no_grad():
   while True:
     game.reset()
+    game.upd()
+    for i in [1]:
+      print("{}..".format(i))
+      time.sleep(1)
     while True:
-      time.sleep(0.0005)
+      time.sleep(0.005)
       state = game.getState()
       action = np.argmax(model(torch.tensor(state)).detach().numpy())
       if action==0: game.up(0)
@@ -29,6 +33,8 @@ with torch.no_grad():
       if game.isGameOver():
         if game.getReward(0)>0:
           print('plr1 won.')
+          game.scores[0] += 1
         else:
           print('plr2 won.')
+          game.scores[1] += 1
         break
