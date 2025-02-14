@@ -1,13 +1,13 @@
 import numpy as np
 
-c = np.array([]).reshape(0,2)
-a = np.array([1,2])
-b = np.array([3,4])
-a+=b
-print(a)
-print(c)
-c = np.append(c,[a])
-c = np.append(c,[b])
-c = np.append(c,[a])
-c = np.append(c,[a])
-print(c)
+a = np.array([[1,2,3],[4,6,5],[9,8,7],[7,5,10]])
+b = np.argmax(a,axis=1)
+
+print(b)
+
+c = np.array([[9,8,7],[6,5,4],[3,2,1],[10,11,12]])
+d = c[np.arange(len(b)),b]
+
+print(d)
+
+# 7 5 3 12

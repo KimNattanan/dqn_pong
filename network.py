@@ -5,7 +5,7 @@ import torch.optim.adam
 class Network(nn.Module):
   def __init__(self):
     super().__init__()
-    self.fc1 = nn.Linear(6,100)
+    self.fc1 = nn.Linear(8,100)
     self.fc2 = nn.Linear(100,100)
     self.fc3 = nn.Linear(100,3)
     self.fc4 = nn.Linear(100,50)

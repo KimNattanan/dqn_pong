@@ -13,17 +13,21 @@ WINDOW_W, WINDOW_H = 800, 480
 
 memory_size = 100000
 reward_discount_factor = 0.99
-number_of_ep = 10000
-epsilon = 1.0
+number_of_ep = 1000000
 epsilon_decay_factor = 0.999
 epsilon_min = 0.01
 batch_size = 10
 target_network_update_int = 500
 
+left_plr_checkpoint = './checkpoints/L_online_duel_double_10000.pt'
+right_plr_checkpoint = './checkpoints/R_online_duel_double_10000.pt'
+begin_ep = 10001
+epsilon = max(epsilon_min, epsilon_decay_factor**(begin_ep-1))
+
 game = Game(True)
 models = np.array([
-  [Network(),Network(),deque(maxlen=memory_size)], # online, target, memo
-  [Network(),Network(),deque(maxlen=memory_size)]
+  [torch.load(left_plr_checkpoint,weights_only=False),torch.load(left_plr_checkpoint,weights_only=False),deque(maxlen=memory_size)],
+  [torch.load(right_plr_checkpoint,weights_only=False),torch.load(right_plr_checkpoint,weights_only=False),deque(maxlen=memory_size)]
 ],dtype=object)
 optimizers = np.array([torch.optim.Adam(models[0,0].parameters(),lr=0.001),torch.optim.Adam(models[1,0].parameters(),lr=0.001)])
 loss_funcs = np.array([nn.MSELoss(),nn.MSELoss()])
@@ -34,9 +38,10 @@ models[0,1].train()
 models[1,0].train()
 models[1,1].train()
 rewards_hist = np.array([]).reshape(0,2)
-for ep in range(number_of_ep):
+for ep in range(begin_ep-1,number_of_ep):
   game.reset()
-  state0,state1 = game.getState(0), game.getState(1)
+  state0 = game.getState(0)
+  state1 = game.getState(1)
   sum_rewards = np.array([0,0])
   print("game {} start!".format(ep+1))
   while True:
@@ -67,20 +72,14 @@ for ep in range(number_of_ep):
     rewards = np.array([game.getReward(0),game.getReward(1)])
     sum_rewards += rewards
 
-    if rewards[0]==4:
-      print('L: hit')
-    if rewards[1]==4:
-      print('R: hit')
-
     next_state0 = game.getState(0)
     next_state1 = game.getState(1)
     done = game.isGameOver()
     
-    
     models[0,2].append([state0,action0,rewards[0],next_state0,done])
     models[1,2].append([state1,action1,rewards[1],next_state1,done])
     model_to_fit = random.randint(0,1)
-
+    
     if model_to_fit==0 and len(models[0,2])>=batch_size:
       batch = np.array(random.sample(models[0,2],batch_size),dtype=object)
       state_tensor = torch.tensor(list(batch[:,0]))
@@ -93,7 +92,7 @@ for ep in range(number_of_ep):
       current_Q = models[0,1](state_tensor).detach().numpy()
       current_Q[np.arange(batch_size),list(batch[:,1])] = target
       models[0,0].fit(state_tensor,torch.tensor(current_Q),optimizers[0],loss_funcs[0])
-
+      
     elif model_to_fit==1 and len(models[1,2])>=batch_size:
       batch = np.array(random.sample(models[1,2],batch_size),dtype=object)
       state_tensor = torch.tensor(list(batch[:,0]))
@@ -123,6 +122,10 @@ for ep in range(number_of_ep):
         game.scores[1] += 1
         print('R: win ',game.scores[1])
       break
+    if rewards[0]>0:
+      print('L: hit')
+    if rewards[1]>0:
+      print('R: hit')
   rewards_hist = np.append(rewards_hist,[sum_rewards],axis=0)
 
   if (ep+1)%100==0:

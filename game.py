@@ -62,14 +62,14 @@ class App:
     if self.plr2: del self.plr2
     if self.ball: del self.ball
 
-    self.plr1 = Player(50,WINDOW_H/2-50,20,100)
-    self.plr2 = Player(WINDOW_W-50,WINDOW_H/2-50,20,100)
+    self.plr1 = Player(40,WINDOW_H/2-50,20,100)
+    self.plr2 = Player(WINDOW_W-60,WINDOW_H/2-50,20,100)
     self.up, self.down, self.hits = np.array([False]*2),np.array([False]*2),np.array([0]*2)
     ball_vx = random.randint(1,10)
     if random.randint(0,1) : ball_vx = -ball_vx
     ball_vy = random.randint(-5,5)
     ball_vx,ball_vy = self.normVec((ball_vx,ball_vy))
-    self.ball = Ball(WINDOW_W/2,WINDOW_H/2,10,ball_vx,ball_vy)
+    self.ball = Ball(WINDOW_W/2,random.randint(10,WINDOW_H-10),10,ball_vx,ball_vy)
 
     score_font = pygame.font.SysFont('Comic Sans MS', 30)
     self.score1 = score_font.render(str(scores[0]),False,(0,255,0))
@@ -191,8 +191,21 @@ class Game:
   def cleanup(self):
     self.app.on_cleanup()
 
-  def getState(self):
-    return (self.app.ball.x,self.app.ball.y, self.app.ball.dx,self.app.ball.dy, self.app.plr1.y+self.app.plr1.h/2, self.app.plr2.y+self.app.plr2.h/2)
+  def getState(self,id):
+    state0 = (
+      self.app.ball.x,self.app.ball.y,
+      self.app.ball.dx,self.app.ball.dy,
+      self.app.plr1.x+self.app.plr1.w/2, self.app.plr1.y+self.app.plr1.h/2,
+      self.app.plr2.x+self.app.plr2.w/2, self.app.plr2.y+self.app.plr2.h/2
+    )
+    if id==0: return state0
+    return (
+      WINDOW_W-state0[0],state0[1],
+      -state0[2],state0[3],
+      WINDOW_W-state0[6],state0[7],
+      WINDOW_W-state0[4],state0[5]
+    )
+  
   def isGameOver(self):
     if self.app.ball.x<0 or self.app.ball.x>WINDOW_W:
       return 1
@@ -206,7 +219,7 @@ class Game:
       return -100
     if self.app.hits[id]:
       self.app.hits[id] = 2
-      return 2
+      return 4
     if self.app.hits[id^1]:
       return -1
     return 0
