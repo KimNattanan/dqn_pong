@@ -9,23 +9,25 @@ from game import Game
 from network import Network
 
 
-WINDOW_W, WINDOW_H = 800, 480
+WINDOW_W, WINDOW_H = 800, 600
 
 memory_size = 100000
 reward_discount_factor = 0.99
-number_of_ep = 10000
+learning_rate = 1e-4
+number_of_ep = 20000
 epsilon = 1.0
-epsilon_decay_factor = 0.999
+epsilon_decay_factor = 0.99999
 epsilon_min = 0.01
 batch_size = 10
-target_network_update_int = 500
+target_network_update_int = 10000
+learn_every = 10
 
 game = Game(True)
 models = np.array([
   [Network(),Network(),deque(maxlen=memory_size)], # online, target, memo
   [Network(),Network(),deque(maxlen=memory_size)]
 ],dtype=object)
-optimizers = np.array([torch.optim.Adam(models[0,0].parameters(),lr=0.001),torch.optim.Adam(models[1,0].parameters(),lr=0.001)])
+optimizers = np.array([torch.optim.Adam(models[0,0].parameters(),lr=learning_rate),torch.optim.Adam(models[1,0].parameters(),lr=learning_rate)])
 loss_funcs = np.array([nn.MSELoss(),nn.MSELoss()])
 
 cnt = 0
@@ -67,11 +69,6 @@ for ep in range(number_of_ep):
     rewards = np.array([game.getReward(0),game.getReward(1)])
     sum_rewards += rewards
 
-    if rewards[0]==4:
-      print('L: hit')
-    if rewards[1]==4:
-      print('R: hit')
-
     next_state0 = game.getState(0)
     next_state1 = game.getState(1)
     done = game.isGameOver()
@@ -81,31 +78,32 @@ for ep in range(number_of_ep):
     models[1,2].append([state1,action1,rewards[1],next_state1,done])
     model_to_fit = random.randint(0,1)
 
-    if model_to_fit==0 and len(models[0,2])>=batch_size:
-      batch = np.array(random.sample(models[0,2],batch_size),dtype=object)
-      state_tensor = torch.tensor(list(batch[:,0]))
-      next_state_tensor = torch.tensor(list(batch[:,3]))
+    if cnt%learn_every==0:
+      if model_to_fit==0 and len(models[0,2])>=batch_size:
+        batch = np.array(random.sample(models[0,2],batch_size),dtype=object)
+        state_tensor = torch.tensor(list(batch[:,0]))
+        next_state_tensor = torch.tensor(list(batch[:,3]))
 
-      cur_pred = models[0,1](next_state_tensor).detach().numpy()
-      another_pred = models[1,1](next_state_tensor).detach().numpy()
+        cur_pred = models[0,1](next_state_tensor).detach().numpy()
+        another_pred = models[1,1](next_state_tensor).detach().numpy()
 
-      target = batch[:,2] + reward_discount_factor*(another_pred[np.arange(cur_pred.shape[0]),np.argmax(cur_pred,axis=1)])*(1-batch[:,4])
-      current_Q = models[0,1](state_tensor).detach().numpy()
-      current_Q[np.arange(batch_size),list(batch[:,1])] = target
-      models[0,0].fit(state_tensor,torch.tensor(current_Q),optimizers[0],loss_funcs[0])
+        target = batch[:,2] + reward_discount_factor*(another_pred[np.arange(cur_pred.shape[0]),np.argmax(cur_pred,axis=1)])*(1-batch[:,4])
+        current_Q = models[0,1](state_tensor).detach().numpy()
+        current_Q[np.arange(batch_size),list(batch[:,1])] = target
+        models[0,0].fit(state_tensor,torch.tensor(current_Q),optimizers[0],loss_funcs[0])
 
-    elif model_to_fit==1 and len(models[1,2])>=batch_size:
-      batch = np.array(random.sample(models[1,2],batch_size),dtype=object)
-      state_tensor = torch.tensor(list(batch[:,0]))
-      next_state_tensor = torch.tensor(list(batch[:,3]))
+      elif model_to_fit==1 and len(models[1,2])>=batch_size:
+        batch = np.array(random.sample(models[1,2],batch_size),dtype=object)
+        state_tensor = torch.tensor(list(batch[:,0]))
+        next_state_tensor = torch.tensor(list(batch[:,3]))
 
-      cur_pred = models[1,1](next_state_tensor).detach().numpy()
-      another_pred = models[0,1](next_state_tensor).detach().numpy()
+        cur_pred = models[1,1](next_state_tensor).detach().numpy()
+        another_pred = models[0,1](next_state_tensor).detach().numpy()
 
-      target = batch[:,2] + reward_discount_factor*(another_pred[np.arange(cur_pred.shape[0]),np.argmax(cur_pred,axis=1)])*(1-batch[:,4])
-      current_Q = models[1,1](state_tensor).detach().numpy()
-      current_Q[np.arange(batch_size),list(batch[:,1])] = target
-      models[1,0].fit(state_tensor,torch.tensor(current_Q),optimizers[0],loss_funcs[0])
+        target = batch[:,2] + reward_discount_factor*(another_pred[np.arange(cur_pred.shape[0]),np.argmax(cur_pred,axis=1)])*(1-batch[:,4])
+        current_Q = models[1,1](state_tensor).detach().numpy()
+        current_Q[np.arange(batch_size),list(batch[:,1])] = target
+        models[1,0].fit(state_tensor,torch.tensor(current_Q),optimizers[0],loss_funcs[0])
     
     state0 = next_state0
     state1 = next_state1
@@ -123,9 +121,15 @@ for ep in range(number_of_ep):
         game.scores[1] += 1
         print('R: win ',game.scores[1])
       break
+    else:
+      if rewards[0]>0:
+        print('L: hit')
+      if rewards[1]>0:
+        print('R: hit')
   rewards_hist = np.append(rewards_hist,[sum_rewards],axis=0)
 
   if (ep+1)%100==0:
     models[0,0].save('./checkpoints/L_online_duel_double_{}.pt'.format(ep+1))
     models[1,0].save('./checkpoints/R_online_duel_double_{}.pt'.format(ep+1))
     pickle.dump(rewards_hist,open('./graphs/rewards_hist.pkl','wb'))
+    print(epsilon)

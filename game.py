@@ -5,13 +5,13 @@ import numpy as np
 import random
 
 
-WINDOW_W, WINDOW_H =  800, 480
+WINDOW_W, WINDOW_H =  800, 600
 
 class Player:
   def __init__(self,x,y,w,h):
     self.x, self.y = x,y
     self.w, self.h = w,h
-    self.speed = 1*5
+    self.speed = 2*5
 
   def move(self,dx,dy):
     self.x = max(0,min(self.x+dx*self.speed,WINDOW_W-self.w))
@@ -26,7 +26,7 @@ class Player:
 class Ball:
   def __init__(self,x,y,rad,dx,dy):
     self.x, self.y, self.rad = x,y,rad
-    self.speed = 2*5
+    self.speed = 2*3
     self.dx, self.dy = dx,dy
   
   def move(self):
@@ -55,16 +55,19 @@ class App:
     self.ball = None
     self.up, self.down, self.hits = None,None,None
     self.score1, self.score2 = None,None
-    self.reset(np.array([0,0]))
-
-  def reset(self,scores):
-    if self.plr1: del self.plr1
-    if self.plr2: del self.plr2
-    if self.ball: del self.ball
 
     self.plr1 = Player(40,WINDOW_H/2-50,20,100)
     self.plr2 = Player(WINDOW_W-60,WINDOW_H/2-50,20,100)
-    self.up, self.down, self.hits = np.array([False]*2),np.array([False]*2),np.array([0]*2)
+    self.up, self.down = np.array([False]*2),np.array([False]*2)
+    
+    self.reset(np.array([0,0]))
+
+  def reset(self,scores):
+    # if self.plr1: del self.plr1
+    # if self.plr2: del self.plr2
+    if self.ball: del self.ball
+
+    self.hits = np.array([0]*2)
     ball_vx = random.randint(1,10)
     if random.randint(0,1) : ball_vx = -ball_vx
     ball_vy = random.randint(-5,5)
@@ -212,16 +215,16 @@ class Game:
     return 0
   def getReward(self,id):
     if self.app.ball.x<0:
-      if id==0: return -100
-      return 20
+      if id==0: return -10
+      return 5
     if self.app.ball.x>WINDOW_W:
-      if id==0: return 20
-      return -100
+      if id==0: return 5
+      return -10
     if self.app.hits[id]:
       self.app.hits[id] = 2
-      return 4
+      return 1
     if self.app.hits[id^1]:
-      return -1
+      return 0
     return 0
   
   def up(self,id):

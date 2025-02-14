@@ -5,19 +5,17 @@ import torch.optim.adam
 class Network(nn.Module):
   def __init__(self):
     super().__init__()
-    self.fc1 = nn.Linear(8,100)
-    self.fc2 = nn.Linear(100,100)
-    self.fc3 = nn.Linear(100,3)
-    self.fc4 = nn.Linear(100,50)
-    self.fc5 = nn.Linear(50,1)
+    self.fc1 = nn.Linear(8,512)
+    self.fc2 = nn.Linear(512,256)
+    self.fc3 = nn.Linear(256,1)
+    self.fc4 = nn.Linear(256,3)
     self.relu = nn.ReLU()
 
   def forward(self,x):
-    x = self.relu(self.fc1(x)) # 100
-    V = self.relu(self.fc4(x)) # 50
-    V = self.fc5(V) # 1
-    A = self.relu(self.fc2(x)) # 100
-    A = self.fc3(A)
+    x = self.relu(self.fc1(x)) # 512
+    x = self.relu(self.fc2(x)) # 256
+    V = self.fc3(x) # 1
+    A = self.fc4(x) # 3
     Q = torch.add(V,other=torch.mean(A),alpha=-1) + A
     return Q
   
