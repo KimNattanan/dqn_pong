@@ -9,7 +9,7 @@ from network import Network
 
 
 WINDOW_W, WINDOW_H = 800, 600
-CHECKPOINT_PATH = './checkpoints/L_online_duel_double_20000.pt'
+CHECKPOINT_PATH = './checkpoints/online_duel_vsbot_0_6300.pt'
 CHECKPOINT_PATH2 = './checkpoints/R_online_duel_double_20000.pt'
 
 game = Game(True)
@@ -31,7 +31,7 @@ with torch.no_grad():
       zz = game.getReward(1)
       if z != 0: print(z,zz)
       state = torch.tensor(game.getState(0))
-      action = np.argmax(model(state).detach().numpy()+model2(state).detach().numpy())
+      action = np.argmax(model(state).detach().numpy())
       if action==0: game.up(0)
       elif action==1: game.idle(0)
       elif action==2: game.down(0)

@@ -78,32 +78,18 @@ for ep in range(number_of_ep):
     models[1,2].append([state1,action1,rewards[1],next_state1,done])
     model_to_fit = random.randint(0,1)
 
-    if cnt%learn_every==0:
-      if model_to_fit==0 and len(models[0,2])>=batch_size:
-        batch = np.array(random.sample(models[0,2],batch_size),dtype=object)
-        state_tensor = torch.tensor(list(batch[:,0]))
-        next_state_tensor = torch.tensor(list(batch[:,3]))
+    if cnt%learn_every==0 and len(models[model_to_fit,2])>=batch_size:
+      batch = np.array(random.sample(models[model_to_fit,2],batch_size),dtype=object)
+      state_tensor = torch.tensor(list(batch[:,0]))
+      next_state_tensor = torch.tensor(list(batch[:,3]))
 
-        cur_pred = models[0,1](next_state_tensor).detach().numpy()
-        another_pred = models[1,1](next_state_tensor).detach().numpy()
+      cur_pred = models[model_to_fit,1](next_state_tensor).detach().numpy()
+      another_pred = models[1^model_to_fit,1](next_state_tensor).detach().numpy()
 
-        target = batch[:,2] + reward_discount_factor*(another_pred[np.arange(cur_pred.shape[0]),np.argmax(cur_pred,axis=1)])*(1-batch[:,4])
-        current_Q = models[0,1](state_tensor).detach().numpy()
-        current_Q[np.arange(batch_size),list(batch[:,1])] = target
-        models[0,0].fit(state_tensor,torch.tensor(current_Q),optimizers[0],loss_funcs[0])
-
-      elif model_to_fit==1 and len(models[1,2])>=batch_size:
-        batch = np.array(random.sample(models[1,2],batch_size),dtype=object)
-        state_tensor = torch.tensor(list(batch[:,0]))
-        next_state_tensor = torch.tensor(list(batch[:,3]))
-
-        cur_pred = models[1,1](next_state_tensor).detach().numpy()
-        another_pred = models[0,1](next_state_tensor).detach().numpy()
-
-        target = batch[:,2] + reward_discount_factor*(another_pred[np.arange(cur_pred.shape[0]),np.argmax(cur_pred,axis=1)])*(1-batch[:,4])
-        current_Q = models[1,1](state_tensor).detach().numpy()
-        current_Q[np.arange(batch_size),list(batch[:,1])] = target
-        models[1,0].fit(state_tensor,torch.tensor(current_Q),optimizers[0],loss_funcs[0])
+      target = batch[:,2] + reward_discount_factor*(another_pred[np.arange(cur_pred.shape[0]),np.argmax(cur_pred,axis=1)])*(1-batch[:,4])
+      current_Q = models[model_to_fit,1](state_tensor).detach().numpy()
+      current_Q[np.arange(batch_size),list(batch[:,1])] = target
+      models[model_to_fit,0].fit(state_tensor,torch.tensor(current_Q),optimizers[0],loss_funcs[0])
     
     state0 = next_state0
     state1 = next_state1
