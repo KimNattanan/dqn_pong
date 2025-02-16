@@ -3,6 +3,7 @@ from pygame.locals import *
 import math
 import numpy as np
 import random
+import sys
 
 
 WINDOW_W, WINDOW_H =  800, 600
@@ -11,7 +12,7 @@ class Player:
   def __init__(self,x,y,w,h):
     self.x, self.y = x,y
     self.w, self.h = w,h
-    self.speed = 2*5
+    self.speed = 4
 
   def move(self,dx,dy):
     self.x = max(0,min(self.x+dx*self.speed,WINDOW_W-self.w))
@@ -26,7 +27,7 @@ class Player:
 class Ball:
   def __init__(self,x,y,rad,dx,dy):
     self.x, self.y, self.rad = x,y,rad
-    self.speed = 2*3
+    self.speed = 8
     self.dx, self.dy = dx,dy
   
   def move(self):
@@ -56,23 +57,24 @@ class App:
     self.up, self.down, self.hits = None,None,None
     self.score1, self.score2 = None,None
 
-    self.plr1 = Player(40,WINDOW_H/2-50,20,100)
-    self.plr2 = Player(WINDOW_W-60,WINDOW_H/2-50,20,100)
-    self.up, self.down = np.array([False]*2),np.array([False]*2)
     
     self.reset(np.array([0,0]))
 
   def reset(self,scores):
-    # if self.plr1: del self.plr1
-    # if self.plr2: del self.plr2
+    if self.plr1: del self.plr1
+    if self.plr2: del self.plr2
     if self.ball: del self.ball
+
+    self.plr1 = Player(40,WINDOW_H/2-50,20,100)
+    self.plr2 = Player(WINDOW_W-60,WINDOW_H/2-50,20,100)
+    self.up, self.down = np.array([False]*2),np.array([False]*2)
 
     self.hits = np.array([0]*2)
     ball_vx = random.randint(1,10)
     if random.randint(0,1) : ball_vx = -ball_vx
     ball_vy = random.randint(-5,5)
     ball_vx,ball_vy = self.normVec((ball_vx,ball_vy))
-    self.ball = Ball(WINDOW_W/2,random.randint(10,WINDOW_H-10),10,ball_vx,ball_vy)
+    self.ball = Ball(WINDOW_W/2,WINDOW_H/2,10,ball_vx,ball_vy)
 
     score_font = pygame.font.SysFont('Comic Sans MS', 30)
     self.score1 = score_font.render(str(scores[0]),False,(0,255,0))
@@ -88,6 +90,8 @@ class App:
     if not self.display: return
     if event.type == pygame.QUIT:
       self._running = False
+      self.on_cleanup()
+      sys.exit()
     elif event.type == pygame.KEYDOWN:
       self.keyDown[event.key] = True
     elif event.type == pygame.KEYUP:
@@ -143,18 +147,6 @@ class App:
   def on_cleanup(self):
     pygame.quit()
 
-  def on_execute(self):
-    if self.on_init() == False:
-      self._running = False
-
-    while( self._running ):
-      if self.display:
-        for event in pygame.event.get():
-          self.on_event(event)
-      self.on_loop()
-      self.on_render()
-    self.on_cleanup()
-
   def normVec(self,vec):
     sz = math.sqrt(vec[0]**2+vec[1]**2)
     return (vec[0]/sz, vec[1]/sz)
@@ -171,9 +163,11 @@ class App:
 class Game:
   STATE_SHAPE = 6
   ACTION_SHAPE = 3
-  def __init__(self,display=True):
+  def __init__(self,display=True,Lbot=False,Rbot=False):
     self.app = App(display)
     self.force_quit = False
+    self.Lbot = Lbot
+    self.Rbot = Rbot
     self.scores = np.array([0,0])
 
     self.app.on_init()
@@ -185,6 +179,14 @@ class Game:
         self.app.on_event(event)
       if self.app.getKeyDown(pygame.K_ESCAPE):
         self.force_quit = True
+    if self.Lbot:
+      if self.app.plr1.y>self.app.ball.y: self.up(0)
+      elif self.app.plr1.y==self.app.ball.y: self.idle(0)
+      else: self.down(0)
+    if self.Rbot:
+      if self.app.plr2.y>self.app.ball.y: self.up(1)
+      elif self.app.plr2.y==self.app.ball.y: self.idle(1)
+      else: self.down(1)
     self.app.on_loop()
     self.app.on_render()
 
