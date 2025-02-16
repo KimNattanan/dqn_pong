@@ -222,7 +222,7 @@ class Game:
     if self.app.ball.x>WINDOW_W:
       if id==0: return 5
       return -10
-    if self.app.hits[id]:
+    if self.app.hits[id]==1:
       self.app.hits[id] = 2
       return 1
     if self.app.hits[id^1]:
