@@ -66,7 +66,8 @@ def train_bot(
   ep_per_save = 100,
   save_name = '',
   checkpoint_path = '',
-  begin_ep = 1
+  begin_ep = 1,
+  display = True
 ):
 
   if start_epsilon: epsilon = start_epsilon
@@ -80,7 +81,7 @@ def train_bot(
   optimizer = torch.optim.Adam(model[0].parameters(),lr=learning_rate)
   loss_func = nn.MSELoss()
 
-  game = Game(True,Rbot=True)
+  game = Game(display=display,Rbot=True)
   cnt = 0
   model[0].train()
   model[1].eval()
@@ -156,7 +157,8 @@ def train_ai(
   save_name2 = '',
   checkpoint_path = '',
   checkpoint_path2 = '',
-  begin_ep = 1
+  begin_ep = 1,
+  display = True
 ):
 
   if start_epsilon: epsilon = start_epsilon
@@ -174,7 +176,7 @@ def train_ai(
   optimizer,optimizer2 = torch.optim.Adam(model[0].parameters(),lr=learning_rate), torch.optim.Adam(model2[0].parameters(),lr=learning_rate)
   loss_func, loss_func2 = nn.MSELoss(), nn.MSELoss()
 
-  game = Game(True)
+  game = Game(display=display)
   cnt = 0
   model[0].train()
   model[1].eval()
@@ -265,7 +267,8 @@ def train_ai_double(
   save_name2 = '',
   checkpoint_path = '',
   checkpoint_path2 = '',
-  begin_ep = 1
+  begin_ep = 1,
+  display = True
 ):
 
   if start_epsilon: epsilon = start_epsilon
@@ -283,7 +286,7 @@ def train_ai_double(
   optimizer,optimizer2 = torch.optim.Adam(model[0].parameters(),lr=learning_rate), torch.optim.Adam(model2[0].parameters(),lr=learning_rate)
   loss_func, loss_func2 = nn.MSELoss(), nn.MSELoss()
 
-  game = Game(True)
+  game = Game(display=display)
   cnt = 0
   model[0].train()
   model[1].eval()
