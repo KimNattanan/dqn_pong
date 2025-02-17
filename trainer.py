@@ -139,6 +139,7 @@ def train_bot(
       pickle.dump(hitcnt_hist,open('./graphs/hitcnt_hist.pkl','wb'))
 
   print("score: {} : {}".format(game.scores[0],game.scores[1]))
+  del game
 
 
 def train_ai(
@@ -247,6 +248,7 @@ def train_ai(
       pickle.dump(hitcnt_hist,open('./graphs/hitcnt_hist.pkl','wb'))
 
   print("score: {} : {}".format(game.scores[0],game.scores[1]))
+  del game
 
 
 
@@ -360,4 +362,5 @@ def train_ai_double(
       pickle.dump(hitcnt_hist,open('./graphs/hitcnt_hist.pkl','wb'))
 
   print("score: {} : {}".format(game.scores[0],game.scores[1]))
+  del game
 

@@ -91,7 +91,6 @@ class App:
     if event.type == pygame.QUIT:
       self._running = False
       self.on_cleanup()
-      sys.exit()
     elif event.type == pygame.KEYDOWN:
       self.keyDown[event.key] = True
     elif event.type == pygame.KEYUP:
