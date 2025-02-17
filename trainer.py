@@ -65,6 +65,7 @@ def train_bot(
   step_per_learn = 10,
   ep_per_save = 100,
   save_name = '',
+  plot_name = '',
   checkpoint_path = '',
   begin_ep = 1,
   display = True
@@ -135,8 +136,8 @@ def train_bot(
     if ep%ep_per_save==0:
       if len(save_name):
         model[0].save('./checkpoints/{}_{}.pt'.format(save_name,ep))
-      pickle.dump(rewards_hist,open('./graphs/rewards_hist.pkl','wb'))
-      pickle.dump(hitcnt_hist,open('./graphs/hitcnt_hist.pkl','wb'))
+      pickle.dump(rewards_hist,open('./graphs/rewards_hist_{}.pkl'.format(plot_name),'wb'))
+      pickle.dump(hitcnt_hist,open('./graphs/hitcnt_hist_{}.pkl'.format(plot_name),'wb'))
 
   print("score: {} : {}".format(game.scores[0],game.scores[1]))
   del game
@@ -156,6 +157,7 @@ def train_ai(
   ep_per_save = 100,
   save_name = '',
   save_name2 = '',
+  plot_name = '',
   checkpoint_path = '',
   checkpoint_path2 = '',
   begin_ep = 1,
@@ -244,8 +246,8 @@ def train_ai(
         model[0].save('./checkpoints/{}_{}.pt'.format(save_name,ep))
       if len(save_name2):
         model2[0].save('./checkpoints/{}_{}.pt'.format(save_name2,ep))
-      pickle.dump(rewards_hist,open('./graphs/rewards_hist.pkl','wb'))
-      pickle.dump(hitcnt_hist,open('./graphs/hitcnt_hist.pkl','wb'))
+      pickle.dump(rewards_hist,open('./graphs/rewards_hist_{}.pkl'.format(plot_name),'wb'))
+      pickle.dump(hitcnt_hist,open('./graphs/hitcnt_hist_{}.pkl'.format(plot_name),'wb'))
 
   print("score: {} : {}".format(game.scores[0],game.scores[1]))
   del game
@@ -267,6 +269,7 @@ def train_ai_double(
   ep_per_save = 100,
   save_name = '',
   save_name2 = '',
+  plot_name = '',
   checkpoint_path = '',
   checkpoint_path2 = '',
   begin_ep = 1,
@@ -358,8 +361,8 @@ def train_ai_double(
         model[0].save('./checkpoints/{}_{}.pt'.format(save_name,ep))
       if len(save_name2):
         model2[0].save('./checkpoints/{}_{}.pt'.format(save_name2,ep))
-      pickle.dump(rewards_hist,open('./graphs/rewards_hist.pkl','wb'))
-      pickle.dump(hitcnt_hist,open('./graphs/hitcnt_hist.pkl','wb'))
+      pickle.dump(rewards_hist,open('./graphs/rewards_hist_{}.pkl'.format(plot_name),'wb'))
+      pickle.dump(hitcnt_hist,open('./graphs/hitcnt_hist_{}.pkl'.format(plot_name),'wb'))
 
   print("score: {} : {}".format(game.scores[0],game.scores[1]))
   del game
