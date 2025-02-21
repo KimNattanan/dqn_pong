@@ -77,8 +77,8 @@ class App:
     self.ball = Ball(WINDOW_W/2,WINDOW_H/2,10,ball_vx,ball_vy)
 
     score_font = pygame.font.SysFont('Comic Sans MS', 30)
-    self.score1 = score_font.render(str(scores[0]),False,(0,255,0))
-    self.score2 = score_font.render(str(scores[1]),False,(0,255,0))
+    self.score1 = score_font.render('AI: '+str(scores[0]),False,(0,255,0))
+    self.score2 = score_font.render('You: '+str(scores[1]),False,(0,255,0))
 
   def on_init(self):
     pygame.init()
