@@ -114,6 +114,8 @@ def train_bot(
         model[1].load_state_dict(model[0].state_dict())
       step += 1
       if done:
+        if reward0>0: game.scores[0] +=1
+        else: game.scores[1] +=1
         break
 
     epsilon = max(epsilon_min,epsilon*epsilon_decay_factor)
@@ -208,6 +210,8 @@ def train_ai(
         model2[1].load_state_dict(model2[0].state_dict())
       step += 1
       if done:
+        if reward0>0: game.scores[0] +=1
+        else: game.scores[1] +=1
         break
 
     epsilon = max(epsilon_min,epsilon*epsilon_decay_factor)
@@ -312,6 +316,8 @@ def train_ai_double(
         model2[1].load_state_dict(model2[0].state_dict())
       step += 1
       if done:
+        if reward0>0: game.scores[0] +=1
+        else: game.scores[1] +=1
         break
 
     epsilon = max(epsilon_min,epsilon*epsilon_decay_factor)
