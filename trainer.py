@@ -56,11 +56,11 @@ def _fit_batch(
 
 def train_bot(
   memory_size = 500000,
-  reward_discount_factor = 0.99,
-  learning_rate = 1e-4,
+  reward_discount_factor = 0.99, # gamma
+  learning_rate = 0.0001, # alpha
   number_of_ep = 20000,
-  epsilon_decay_factor = 0.9977,
-  epsilon_min = 0.05,
+  epsilon_decay_factor = 0.995,
+  epsilon_min = 0.01,
   start_epsilon = 0,
   batch_size = 64,
   target_network_update_int = 1000,
@@ -134,10 +134,10 @@ def train_bot(
 def train_ai(
   memory_size = 500000,
   reward_discount_factor = 0.99,
-  learning_rate = 1e-4,
+  learning_rate = 0.0001,
   number_of_ep = 20000,
-  epsilon_decay_factor = 0.9977,
-  epsilon_min = 0.05,
+  epsilon_decay_factor = 0.995,
+  epsilon_min = 0.01,
   start_epsilon = 0,
   batch_size = 64,
   target_network_update_int = 1000,
@@ -237,10 +237,10 @@ def train_ai(
 def train_ai_double(
   memory_size = 500000,
   reward_discount_factor = 0.99,
-  learning_rate = 1e-4,
+  learning_rate = 0.0001,
   number_of_ep = 20000,
-  epsilon_decay_factor = 0.9977,
-  epsilon_min = 0.05,
+  epsilon_decay_factor = 0.995,
+  epsilon_min = 0.01,
   start_epsilon = 0,
   batch_size = 64,
   target_network_update_int = 1000,

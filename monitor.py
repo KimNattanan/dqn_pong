@@ -31,7 +31,6 @@ class Monitor:
     self.Qmx_per_ep = pickle.load(open('./graphs/{}_Qmx.pkl'.format(name),'rb'))
   
   def plot(self, figsize=(12,10), rewards_avg_window_size=100):
-    plt.clf()
     fig, axs = plt.subplots(1,2, figsize=(figsize))
     rewards_per_ep = np.array(self.rewards_per_ep)
     Qmx_per_ep = np.array(self.Qmx_per_ep)

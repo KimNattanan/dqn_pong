@@ -215,17 +215,18 @@ class Game:
       return 1
     return 0
   def getReward(self,id):
-    if self.app.ball.x<0:
-      if id==0: return -10
-      return 5
-    if self.app.ball.x>WINDOW_W:
-      if id==0: return 5
-      return -10
-    if self.app.hits[id]==1:
-      self.app.hits[id] = 2
-      return 1
-    if self.app.hits[id^1]:
-      return 0
+    if id==0: # left
+      if self.app.ball.x<0: return -1
+      if self.app.ball.x>WINDOW_W: return 1
+      if self.app.hits[id] == 1:
+        self.app.hits[id] = 2
+        return 0.1
+    else: # right
+      if self.app.ball.x<0: return 1
+      if self.app.ball.x>WINDOW_W: return -1
+      if self.app.hits[id] == 1:
+        self.app.hits[id] = 2
+        return 0.1
     return 0
   
   def up(self,id):
